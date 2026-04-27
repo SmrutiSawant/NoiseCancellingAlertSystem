@@ -1,0 +1,12 @@
+[2026-04-27 12:35:47.564] INFO: New database created {"path":"C:\\Projects\\NoiseCancellingAlertSystem\\smart-alert-backend-v2\\data\\smart_alert.db"}
+[2026-04-27 12:35:47.594] INFO: Database migrations complete
+[2026-04-27 12:35:47.596] INFO: WebSocket server ready on /ws
+[2026-04-27 12:35:47.599] INFO: Smart Alert backend running {"port":3001,"env":"development","ws":"ws://localhost:3001/ws"}
+[2026-04-27 13:04:46.248] INFO: Database loaded from disk {"path":"C:\\Projects\\NoiseCancellingAlertSystem\\smart-alert-backend-v2\\data\\smart_alert.db"}
+[2026-04-27 13:04:46.262] INFO: Database migrations complete
+[2026-04-27 13:04:46.263] INFO: WebSocket server ready on /ws
+[2026-04-27 13:04:46.265] INFO: Smart Alert backend running {"port":3001,"env":"development","ws":"ws://localhost:3001/ws"}
+[2026-04-27 19:34:58.051] INFO: Database loaded from disk {"path":"C:\\Projects\\NoiseCancellingAlertSystem\\smart-alert-backend-v2\\data\\smart_alert.db"}
+[2026-04-27 19:34:58.066] INFO: Database migrations complete
+[2026-04-27 19:34:58.072] INFO: WebSocket server ready on /ws
+[2026-04-27 19:34:58.075] INFO: Smart Alert backend running {"port":3001,"env":"development","ws":"ws://localhost:3001/ws"}
