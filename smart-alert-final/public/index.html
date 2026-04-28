@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Alert — WFH Name Detector</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--sf:#111118;--sf2:#1a1a24;--sf3:#22222f;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.12);--ac:#7c6fcd;--ac2:#a594f9;--glow:rgba(124,111,205,0.18);--gn:#4ade80;--gd:rgba(74,222,128,0.12);--am:#fbbf24;--ad:rgba(251,191,36,0.12);--rd:#f87171;--rdd:rgba(248,113,113,0.1);--tx:#e8e8f0;--tx2:#8888a0;--tx3:#55556a;--fn:'Syne',sans-serif;--mo:'DM Mono',monospace;--r:12px;--rs:8px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,111,205,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,205,0.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.app{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr;min-height:100vh;}
+header{border-bottom:1px solid var(--bd);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:60px;background:rgba(10,10,15,0.92);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:28px;height:28px;border-radius:8px;background:var(--ac);display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{width:14px;height:14px;}
+.logo-text{font-size:15px;font-weight:600;letter-spacing:-0.02em;}
+.logo-text span{color:var(--ac2);}
+.srv{display:flex;align-items:center;gap:8px;font-size:12px;font-family:var(--mo);color:var(--tx2);}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--tx3);transition:background .3s;}
+.dot.on{background:var(--gn);box-shadow:0 0 6px var(--gn);}
+.dot.err{background:var(--rd);}
+main{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 60px);}
+.sidebar{border-right:1px solid var(--bd);background:var(--sf);display:flex;flex-direction:column;overflow-y:auto;}
+.sec{padding:18px 20px;border-bottom:1px solid var(--bd);}
+.sec:last-child{border-bottom:none;flex:1;}
+.slbl{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;}
+.atabs{display:flex;gap:4px;margin-bottom:14px;background:var(--sf2);border-radius:var(--rs);padding:3px;}
+.atab{flex:1;padding:6px;border-radius:6px;border:none;font-family:var(--fn);font-size:13px;font-weight:500;color:var(--tx2);background:transparent;cursor:pointer;transition:all .15s;}
+.atab.active{background:var(--sf3);color:var(--tx);}
+.fld{margin-bottom:10px;}
+.fld label{display:block;font-size:11px;font-weight:500;color:var(--tx2);margin-bottom:5px;}
+.fld input{width:100%;padding:9px 12px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-family:var(--mo);font-size:13px;outline:none;transition:border-color .15s;}
+.fld input:focus{border-color:var(--ac);}
+.fld input::placeholder{color:var(--tx3);}
+.btn{width:100%;padding:10px;border-radius:var(--rs);border:none;font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.bp{background:var(--ac);color:#fff;}.bp:hover{background:var(--ac2);}.bp:disabled{opacity:.4;cursor:not-allowed;}
+.bd2{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,113,113,.2);margin-top:8px;}
+.ubadge{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf2);border-radius:var(--rs);border:1px solid var(--bd);}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--glow);border:1px solid var(--ac);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ac2);flex-shrink:0;}
+.uinfo{flex:1;min-width:0;}.uname{font-size:13px;font-weight:600;}.usub{font-size:11px;color:var(--tx2);font-family:var(--mo);}
+.srow{display:flex;gap:8px;align-items:flex-end;}.srow .fld{flex:1;margin-bottom:0;}
+.bsm{padding:9px 14px;border-radius:var(--rs);border:1px solid var(--bd2);font-family:var(--fn);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;color:var(--tx2);background:var(--sf2);}
+.bsm:hover{border-color:var(--ac);color:var(--ac2);}.bsm:disabled{opacity:.4;cursor:not-allowed;}
+.bsm.stop{background:var(--rdd);border-color:rgba(248,113,113,.2);color:var(--rd);}
+.sinfo{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--gd);border:1px solid rgba(74,222,128,.2);border-radius:var(--rs);font-size:11px;font-family:var(--mo);color:var(--gn);margin-top:10px;}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gn);animation:pulse 1.5s ease-in-out infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+.slrow{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.sllbl{font-size:12px;color:var(--tx2);min-width:90px;}
+input[type=range]{flex:1;-webkit-appearance:none;height:4px;background:var(--sf3);border-radius:2px;outline:none;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--ac);cursor:pointer;}
+.slval{font-size:12px;font-family:var(--mo);color:var(--ac2);min-width:32px;text-align:right;}
+.kinrow{display:flex;gap:6px;margin-bottom:10px;}
+.kinrow input{flex:1;padding:8px 10px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-family:var(--mo);font-size:12px;outline:none;transition:border-color .15s;}
+.kinrow input:focus{border-color:var(--ac);}
+.kadd{padding:8px 12px;border-radius:var(--rs);border:1px solid var(--ac);background:var(--glow);color:var(--ac2);font-family:var(--mo);font-size:13px;cursor:pointer;transition:all .15s;}
+.kadd:hover{background:rgba(124,111,205,.25);}
+.chips{display:flex;flex-wrap:wrap;gap:6px;}
+.chip{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:99px;background:var(--sf3);border:1px solid var(--bd2);font-size:12px;font-family:var(--mo);color:var(--tx2);}
+.cdel{width:14px;height:14px;border-radius:50%;background:rgba(248,113,113,.15);border:none;color:var(--rd);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;}
+.content{display:flex;flex-direction:column;overflow:hidden;}
+.tabs{display:flex;border-bottom:1px solid var(--bd);background:var(--sf);padding:0 24px;}
+.tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--tx2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:var(--fn);}
+.tab.active{color:var(--ac2);border-bottom-color:var(--ac);}.tab:hover:not(.active){color:var(--tx);}
+.tpane{flex:1;overflow-y:auto;padding:24px;display:none;}.tpane.active{display:block;}
+.txbox{background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r);padding:20px;margin-bottom:20px;}
+.txlbl{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:12px;}
+textarea{width:100%;min-height:80px;padding:12px;background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);color:var(--tx);font-family:var(--mo);font-size:13px;line-height:1.6;resize:vertical;outline:none;transition:border-color .15s;}
+textarea:focus{border-color:var(--ac);}
+.txact{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;}
+.btx{padding:9px 18px;border-radius:var(--rs);border:1px solid var(--ac);background:var(--glow);color:var(--ac2);font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btx:hover{background:rgba(124,111,205,.25);}.btx:disabled{opacity:.35;cursor:not-allowed;}
+.qbtn{padding:5px 10px;border-radius:99px;border:1px solid var(--bd2);background:var(--sf2);color:var(--tx2);font-size:11px;font-family:var(--mo);cursor:pointer;transition:all .15s;}
+.qbtn:hover{border-color:var(--ac);color:var(--ac2);}
+.rcard{border-radius:var(--r);padding:16px 20px;border:1px solid var(--bd2);margin-bottom:12px;animation:sli .25s ease;}
+@keyframes sli{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.rcard.hit{background:var(--ad);border-color:rgba(251,191,36,.25);}.rcard.miss{background:var(--sf);}
+.rhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.rbadge{font-size:12px;font-weight:600;letter-spacing:.04em;}.rbadge.hit{color:var(--am);}.rbadge.miss{color:var(--tx3);}
+.rtime{font-size:11px;font-family:var(--mo);color:var(--tx3);}
+.rtx{font-size:13px;font-family:var(--mo);color:var(--tx2);line-height:1.5;}
+.rmatch{color:var(--am);font-weight:500;text-decoration:underline dotted;}
+.rconf{font-size:11px;color:var(--tx3);margin-top:6px;}
+.ahdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.atitle{font-size:14px;font-weight:600;}
+.bref{padding:6px 12px;border-radius:var(--rs);border:1px solid var(--bd2);background:var(--sf2);color:var(--tx2);font-size:12px;font-family:var(--fn);cursor:pointer;transition:all .15s;}
+.bref:hover{border-color:var(--ac);color:var(--ac2);}
+.aitem{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:var(--rs);border:1px solid var(--bd);background:var(--sf);margin-bottom:8px;animation:sli .2s ease;}
+.adot{width:8px;height:8px;border-radius:50%;background:var(--am);margin-top:5px;flex-shrink:0;box-shadow:0 0 6px var(--am);}
+.abody{flex:1;min-width:0;}.aword{font-size:14px;font-weight:600;color:var(--am);}
+.atx{font-size:12px;font-family:var(--mo);color:var(--tx2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ameta{font-size:11px;font-family:var(--mo);color:var(--tx3);margin-top:4px;}
+.empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:13px;}.eico{font-size:32px;margin-bottom:10px;opacity:.4;}
+.lcard{background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r);padding:20px;margin-bottom:16px;}
+.lwv{height:60px;border-radius:var(--rs);background:var(--sf2);overflow:hidden;margin-bottom:14px;}
+#wc{width:100%;height:100%;display:block;}
+.lstats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.si{background:var(--sf2);border-radius:var(--rs);padding:10px 12px;}
+.si .lb{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);}
+.si .vl{font-size:18px;font-weight:600;color:var(--tx);margin-top:2px;font-family:var(--mo);}
+.si .vl.g{color:var(--gn);}.si .vl.a{color:var(--am);}
+.lbtns{display:flex;gap:8px;}
+.blis{flex:1;padding:11px;border-radius:var(--rs);font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid;}
+.blis.start{background:var(--gd);border-color:rgba(74,222,128,.3);color:var(--gn);}.blis.start:hover{background:rgba(74,222,128,.2);}
+.blis.stop{background:var(--rdd);border-color:rgba(248,113,113,.2);color:var(--rd);}.blis:disabled{opacity:.35;cursor:not-allowed;}
+.lnote{font-size:11px;color:var(--tx3);margin-top:10px;font-family:var(--mo);line-height:1.6;}
+.flash{position:fixed;inset:0;pointer-events:none;background:rgba(251,191,36,.08);z-index:999;opacity:0;transition:opacity .1s;}.flash.on{opacity:1;}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--rs);font-size:13px;font-family:var(--mo);z-index:1000;animation:ti .2s ease;pointer-events:none;}
+@keyframes ti{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.toast.ok{background:var(--gd);border:1px solid rgba(74,222,128,.3);color:var(--gn);}
+.toast.err{background:var(--rdd);border:1px solid rgba(248,113,113,.2);color:var(--rd);}
+.toast.inf{background:var(--glow);border:1px solid rgba(124,111,205,.3);color:var(--ac2);}
+.errmsg{font-size:12px;color:var(--rd);margin-top:6px;font-family:var(--mo);}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--sf3);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="flash" id="fl"></div>
+<div class="app">
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 14 14" fill="none">
+        <circle cx="7" cy="4.5" r="2.5" stroke="white" stroke-width="1.3"/>
+        <path d="M2.5 13c0-2.5 2-4.5 4.5-4.5s4.5 2 4.5 4.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <span class="logo-text">Smart<span>Alert</span></span>
+  </div>
+  <div class="srv"><div class="dot" id="sdot"></div><span id="stxt">checking…</span></div>
+</header>
+<main>
+<aside class="sidebar">
+  <div class="sec">
+    <div class="slbl">Account</div>
+    <div id="authP">
+      <div class="atabs">
+        <button class="atab active" onclick="swAuth('login')">Login</button>
+        <button class="atab" onclick="swAuth('register')">Register</button>
+      </div>
+      <div class="fld"><label>Username</label><input id="aun" placeholder="your_username" autocomplete="username"></div>
+      <div class="fld"><label>Password</label><input id="apw" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div id="aerr" class="errmsg" style="display:none"></div>
+      <button class="btn bp" id="abtn" onclick="doAuth()" style="margin-top:4px;">Login</button>
+    </div>
+    <div id="userP" style="display:none">
+      <div class="ubadge">
+        <div class="avatar" id="avEl">?</div>
+        <div class="uinfo"><div class="uname" id="unEl">—</div><div class="usub">logged in</div></div>
+      </div>
+      <button class="btn bd2" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="slbl">Session</div>
+    <div class="srow">
+      <div class="fld"><label>Name</label><input id="snm" value="WFH Session"></div>
+      <button class="bsm" id="sbtn" onclick="doSession()">Start</button>
+    </div>
+    <div id="sinfo" style="display:none" class="sinfo">
+      <div class="pulse"></div>
+      <span id="sidEl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;"></span>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="slbl">Noise Suppression</div>
+    <div class="slrow"><span class="sllbl">Sensitivity</span><input type="range" min="1" max="10" value="7" id="sl1" oninput="document.getElementById('sv1').textContent=this.value"><span class="slval" id="sv1">7</span></div>
+    <div class="slrow"><span class="sllbl">Noise Reduction</span><input type="range" min="0" max="100" value="75" id="sl2" oninput="document.getElementById('sv2').textContent=this.value+'%'"><span class="slval" id="sv2">75%</span></div>
+  </div>
+  <div class="sec">
+    <div class="slbl">Keywords / Names</div>
+    <div class="kinrow">
+      <input id="ki" placeholder="Add name or keyword…" onkeydown="if(event.key==='Enter')addKw()">
+      <button class="kadd" onclick="addKw()">+</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</aside>
+<div class="content">
+  <div class="tabs">
+    <button class="tab active" onclick="swTab('tx')">Transcript Test</button>
+    <button class="tab" onclick="swTab('live')">Live Listen</button>
+    <button class="tab" onclick="swTab('log')">Alert Log</button>
+  </div>
+  <div class="tpane active" id="tp-tx">
+    <div class="txbox">
+      <div class="txlbl">Submit transcript for keyword detection</div>
+      <textarea id="txi" placeholder="Type what was said…">Hey Alice, are you on the call?</textarea>
+      <div class="txact">
+        <button class="btx" id="abtn2" onclick="doAnalyze()">Analyze →</button>
+        <button class="qbtn" onclick="setTx('Hey Alice, can you join now?')">Hey Alice</button>
+        <button class="qbtn" onclick="setTx('The weather is nice today')">No match</button>
+        <button class="qbtn" onclick="setTx('John has been calling you')">John</button>
+        <button class="qbtn" onclick="setTx('Hey, is anyone there?')">Hey</button>
+      </div>
+    </div>
+    <div id="res"></div>
+  </div>
+  <div class="tpane" id="tp-live">
+    <div class="lcard">
+      <div class="lwv"><canvas id="wc"></canvas></div>
+      <div class="lstats">
+        <div class="si"><div class="lb">Noise level</div><div class="vl" id="ns">—</div></div>
+        <div class="si"><div class="lb">Voice signal</div><div class="vl g" id="ss">—</div></div>
+        <div class="si"><div class="lb">VAD state</div><div class="vl" id="vs">—</div></div>
+      </div>
+      <div class="lbtns">
+        <button class="blis start" id="lsb" onclick="startListen()">Start Microphone</button>
+        <button class="blis stop" id="lstp" onclick="stopListen()" disabled>Stop</button>
+      </div>
+      <div class="lnote">Microphone streams to the browser. Web Speech API transcribes speech and sends it to the backend for keyword detection in real time.</div>
+    </div>
+    <div id="liveRes"></div>
+  </div>
+  <div class="tpane" id="tp-log">
+    <div class="ahdr"><span class="atitle">Alert History</span><button class="bref" onclick="loadAlerts()">↻ Refresh</button></div>
+    <div id="alist"><div class="empty"><div class="eico">🔕</div>Start a session, then send a transcript with one of your keywords.</div></div>
+  </div>
+</div>
+</main>
+</div>
+
+<script>
+// API is same-origin — no CORS issues since UI is served by the backend itself
+const API = '';
+let tok = localStorage.getItem('sa_tok'), user = null, sid = null;
+let kws = ['Alice', 'hey', 'John'], amode = 'login';
+let ac = null, an = null, ms = null, aid = null, rec = null, listening = false, sp = 0;
+
+(async () => { await chkSrv(); renderChips(); if (tok) await fetchMe(); })();
+
+async function chkSrv() {
+  try {
+    const r = await fetch(API + '/health');
+    const j = await r.json();
+    setSrv(j.status === 'ok');
+  } catch { setSrv(false); }
+}
+function setSrv(ok) {
+  document.getElementById('sdot').className = 'dot' + (ok ? ' on' : ' err');
+  document.getElementById('stxt').textContent = ok ? 'server online' : 'server offline — run npm run dev';
+}
+
+function swAuth(m) {
+  amode = m;
+  document.querySelectorAll('.atab').forEach((t, i) => t.classList.toggle('active', (i === 0 && m === 'login') || (i === 1 && m === 'register')));
+  document.getElementById('abtn').textContent = m === 'login' ? 'Login' : 'Register';
+  document.getElementById('aerr').style.display = 'none';
+}
+
+async function doAuth() {
+  const un = document.getElementById('aun').value.trim();
+  const pw = document.getElementById('apw').value;
+  const ee = document.getElementById('aerr');
+  ee.style.display = 'none';
+  if (!un || !pw) { ee.style.display = 'block'; ee.textContent = 'Enter username and password'; return; }
+  const btn = document.getElementById('abtn');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const r = await fetch(API + '/api/auth/' + amode, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: un, password: pw })
+    });
+    const j = await r.json();
+    if (!r.ok) { ee.style.display = 'block'; ee.textContent = j.error || 'Failed'; return; }
+    tok = j.token;
+    localStorage.setItem('sa_tok', tok);
+    user = j.user;
+    showUser();
+    toast('Logged in as ' + un, 'ok');
+  } catch (e) {
+    ee.style.display = 'block';
+    ee.textContent = 'Cannot reach server';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = amode === 'login' ? 'Login' : 'Register';
+  }
+}
+
+async function fetchMe() {
+  try {
+    const r = await fetch(API + '/api/auth/me', { headers: { Authorization: 'Bearer ' + tok } });
+    if (!r.ok) { tok = null; localStorage.removeItem('sa_tok'); return; }
+    const j = await r.json();
+    user = j.user; showUser();
+  } catch {}
+}
+
+function showUser() {
+  document.getElementById('authP').style.display = 'none';
+  document.getElementById('userP').style.display = 'block';
+  document.getElementById('unEl').textContent = user.username;
+  document.getElementById('avEl').textContent = user.username.slice(0, 2).toUpperCase();
+}
+
+function doLogout() {
+  tok = null; user = null; sid = null;
+  localStorage.removeItem('sa_tok');
+  document.getElementById('authP').style.display = 'block';
+  document.getElementById('userP').style.display = 'none';
+  document.getElementById('sinfo').style.display = 'none';
+  const sb = document.getElementById('sbtn');
+  sb.textContent = 'Start'; sb.className = 'bsm'; sb.disabled = false;
+  stopListen();
+  toast('Logged out', 'inf');
+}
+
+async function doSession() {
+  if (!tok) { toast('Login first', 'err'); return; }
+  if (sid) {
+    try { await fetch(API + '/api/sessions/' + sid, { method: 'DELETE', headers: { Authorization: 'Bearer ' + tok } }); } catch {}
+    sid = null;
+    document.getElementById('sinfo').style.display = 'none';
+    const sb = document.getElementById('sbtn');
+    sb.textContent = 'Start'; sb.className = 'bsm'; sb.disabled = false;
+    stopListen();
+    toast('Session stopped', 'inf');
+    return;
+  }
+  const nm = document.getElementById('snm').value || 'WFH Session';
+  const sensitivity = parseInt(document.getElementById('sl1').value);
+  const noiseReductionStrength = parseInt(document.getElementById('sl2').value) / 100;
+  const sb = document.getElementById('sbtn');
+  sb.disabled = true; sb.textContent = '…';
+  try {
+    const r = await fetch(API + '/api/sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+      body: JSON.stringify({ name: nm, sensitivity, noiseReductionStrength, keywords: kws })
+    });
+    const j = await r.json();
+    if (!r.ok) { toast((j.error || 'Failed to create session') + ' — check backend console', 'err'); sb.disabled = false; sb.textContent = 'Start'; return; }
+    sid = j.session.id;
+    document.getElementById('sinfo').style.display = 'flex';
+    document.getElementById('sidEl').textContent = 'ID: ' + sid;
+    sb.textContent = 'Stop'; sb.className = 'bsm stop'; sb.disabled = false;
+    toast('Session started ✓', 'ok');
+  } catch (e) {
+    toast('Server error: ' + e.message, 'err');
+    sb.disabled = false; sb.textContent = 'Start';
+  }
+}
+
+function addKw() {
+  const inp = document.getElementById('ki'), v = inp.value.trim();
+  if (v && !kws.includes(v)) { kws.push(v); renderChips(); }
+  inp.value = '';
+}
+function removeKw(i) { kws.splice(i, 1); renderChips(); }
+function renderChips() {
+  document.getElementById('chips').innerHTML = kws.map((k, i) =>
+    `<div class="chip">${k}<button class="cdel" onclick="removeKw(${i})">×</button></div>`
+  ).join('');
+}
+
+function setTx(t) { document.getElementById('txi').value = t; }
+
+async function doAnalyze() {
+  if (!sid) { toast('Start a session first', 'err'); return; }
+  const tx = document.getElementById('txi').value.trim();
+  if (!tx) { toast('Enter a transcript first', 'err'); return; }
+  const btn = document.getElementById('abtn2');
+  btn.disabled = true; btn.textContent = 'Analyzing…';
+  try {
+    const r = await fetch(API + '/api/sessions/' + sid + '/transcript', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+      body: JSON.stringify({ transcript: tx, isFinal: true, confidence: 0.95 })
+    });
+    const j = await r.json();
+    if (!r.ok) { toast(j.error || 'Analysis error', 'err'); return; }
+    addResult(tx, j);
+    if (j.detectionsCount > 0) { doFlash(); playBeep(); }
+  } catch (e) { toast('Server error: ' + e.message, 'err'); }
+  finally { btn.disabled = false; btn.textContent = 'Analyze →'; }
+}
+
+function addResult(tx, j) {
+  const area = document.getElementById('res'), hit = j.detectionsCount > 0;
+  const now = new Date().toLocaleTimeString();
+  let disp = tx.replace(/</g, '&lt;');
+  if (hit) j.detections.forEach(d => {
+    disp = disp.replace(new RegExp(d.matchedWord.replace(/</g,'&lt;'), 'gi'), m => `<span class="rmatch">${m}</span>`);
+  });
+  const el = document.createElement('div');
+  el.className = 'rcard ' + (hit ? 'hit' : 'miss');
+  el.innerHTML = `
+    <div class="rhead">
+      <div class="rbadge ${hit ? 'hit' : 'miss'}">${hit ? '⚡ KEYWORD DETECTED' : '○ no match'}</div>
+      <span class="rtime">${now}</span>
+    </div>
+    <div class="rtx">${disp}</div>
+    ${hit ? `<div class="rconf">matched: <b>${j.detections.map(d => d.matchedWord).join(', ')}</b> · confidence: ${Math.round((j.detections[0]?.confidence || 0) * 100)}%</div>` : ''}
+  `;
+  area.insertBefore(el, area.firstChild);
+  if (area.children.length > 20) area.removeChild(area.lastChild);
+}
+
+async function loadAlerts() {
+  if (!sid) { toast('Start a session first', 'err'); return; }
+  try {
+    const r = await fetch(API + '/api/sessions/' + sid + '/alerts', { headers: { Authorization: 'Bearer ' + tok } });
+    const j = await r.json();
+    renderAlerts(j.alerts || []);
+  } catch { toast('Failed to load alerts', 'err'); }
+}
+
+function renderAlerts(arr) {
+  const el = document.getElementById('alist');
+  if (!arr.length) {
+    el.innerHTML = '<div class="empty"><div class="eico">🔕</div>No alerts yet. Send a transcript containing one of your keywords.</div>';
+    return;
+  }
+  el.innerHTML = arr.map(a => {
+    const ts = new Date(Number(a.triggered_at) * 1000).toLocaleString();
+    return `<div class="aitem">
+      <div class="adot"></div>
+      <div class="abody">
+        <div class="aword">"${a.matched_word}"</div>
+        ${a.transcript ? `<div class="atx">${a.transcript}</div>` : ''}
+        <div class="ameta">${ts}</div>
+      </div>
+      ${a.confidence ? `<div style="font-size:11px;color:var(--tx3);font-family:var(--mo);flex-shrink:0;">${Math.round(a.confidence * 100)}%</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+async function startListen() {
+  if (!sid) { toast('Start a session first', 'err'); return; }
+  listening = true;
+  document.getElementById('lsb').disabled = true;
+  document.getElementById('lstp').disabled = false;
+  document.getElementById('vs').textContent = 'Active';
+  document.getElementById('vs').className = 'vl g';
+  try {
+    ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+    ac = new (window.AudioContext || window.webkitAudioContext)();
+    an = ac.createAnalyser(); an.fftSize = 256;
+    ac.createMediaStreamSource(ms).connect(an);
+    drawWave(); startSR();
+    toast('Microphone active', 'ok');
+  } catch {
+    toast('Mic denied — showing simulated waveform', 'inf');
+    simWave();
+  }
+}
+
+function stopListen() {
+  listening = false;
+  if (aid) { cancelAnimationFrame(aid); aid = null; }
+  if (rec) { try { rec.stop(); } catch {} rec = null; }
+  if (ms) { ms.getTracks().forEach(t => t.stop()); ms = null; }
+  if (ac) { ac.close().catch(() => {}); ac = null; }
+  document.getElementById('lsb').disabled = false;
+  document.getElementById('lstp').disabled = true;
+  ['vs', 'ns', 'ss'].forEach(id => { document.getElementById(id).textContent = '—'; document.getElementById(id).className = 'vl'; });
+  const cv = document.getElementById('wc'); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+}
+
+function startSR() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { toast('Speech recognition not supported in this browser (use Chrome)', 'inf'); return; }
+  rec = new SR(); rec.continuous = true; rec.interimResults = true;
+  rec.onresult = async e => {
+    let tx = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) tx += e.results[i][0].transcript;
+    if (!e.results[e.results.length - 1].isFinal || !sid || !tok) return;
+    const conf = e.results[e.results.length - 1][0].confidence;
+    try {
+      const r = await fetch(API + '/api/sessions/' + sid + '/transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
+        body: JSON.stringify({ transcript: tx, isFinal: true, confidence: conf })
+      });
+      const j = await r.json();
+      if (j.detectionsCount > 0) {
+        doFlash(); playBeep();
+        const area = document.getElementById('liveRes'), el = document.createElement('div');
+        el.className = 'aitem';
+        el.innerHTML = `<div class="adot"></div><div class="abody"><div class="aword">"${j.detections[0].matchedWord}" detected</div><div class="atx">${tx}</div><div class="ameta">${new Date().toLocaleTimeString()}</div></div>`;
+        area.insertBefore(el, area.firstChild);
+      }
+    } catch {}
+  };
+  rec.onend = () => { if (listening) { try { rec.start(); } catch {} } };
+  rec.start();
+}
+
+function drawWave() {
+  const cv = document.getElementById('wc'), ctx = cv.getContext('2d'), d = new Uint8Array(an.frequencyBinCount);
+  function draw() {
+    if (!listening) return;
+    aid = requestAnimationFrame(draw);
+    an.getByteTimeDomainData(d);
+    const W = cv.offsetWidth, H = cv.offsetHeight;
+    cv.width = W; cv.height = H; ctx.clearRect(0, 0, W, H);
+    let s = 0; for (let i = 0; i < d.length; i++) s += Math.abs(d[i] - 128);
+    const avg = s / d.length;
+    document.getElementById('ns').textContent = Math.round(avg * 3) + '%';
+    document.getElementById('ss').textContent = avg > 6 ? Math.round(avg * 5) + '%' : '0%';
+    document.getElementById('vs').textContent = avg > 6 ? 'Speech' : 'Silence';
+    document.getElementById('vs').className = 'vl ' + (avg > 6 ? 'a' : 'g');
+    ctx.strokeStyle = '#7c6fcd'; ctx.lineWidth = 1.5; ctx.beginPath();
+    const sw = W / d.length; let x = 0;
+    for (let i = 0; i < d.length; i++) { const y = (d[i] / 128) * H / 2; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); x += sw; }
+    ctx.stroke();
+  }
+  draw();
+}
+
+function simWave() {
+  const cv = document.getElementById('wc'), ctx = cv.getContext('2d');
+  function draw() {
+    if (!listening) return;
+    aid = requestAnimationFrame(draw); sp += 0.1;
+    const W = cv.offsetWidth || 500, H = cv.offsetHeight || 60;
+    cv.width = W; cv.height = H; ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#7c6fcd'; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i = 0; i < W; i++) { const y = H / 2 + Math.sin(i / 15 + sp) * 10 + Math.sin(i / 7 + sp * 1.3) * 4; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); }
+    ctx.stroke();
+    document.getElementById('ns').textContent = Math.round(20 + Math.sin(sp) * 15) + '%';
+    document.getElementById('ss').textContent = Math.round(30 + Math.cos(sp * 0.7) * 20) + '%';
+    document.getElementById('vs').textContent = 'Sim';
+  }
+  draw();
+}
+
+function swTab(n) {
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['tx', 'live', 'log'][i] === n));
+  document.querySelectorAll('.tpane').forEach(p => p.classList.remove('active'));
+  document.getElementById('tp-' + n).classList.add('active');
+  if (n === 'log') loadAlerts();
+}
+
+function doFlash() { const f = document.getElementById('fl'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 600); }
+
+function playBeep() {
+  try {
+    const a = new AudioContext(), o = a.createOscillator(), g = a.createGain();
+    o.connect(g); g.connect(a.destination);
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.25, a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.35);
+    o.start(); o.stop(a.currentTime + 0.35);
+  } catch {}
+}
+
+let _t;
+function toast(msg, type) {
+  if (_t) _t.remove();
+  _t = document.createElement('div');
+  _t.className = 'toast ' + type;
+  _t.textContent = msg;
+  document.body.appendChild(_t);
+  setTimeout(() => { if (_t) { _t.remove(); _t = null; } }, 3500);
+}
+
+renderChips();
+</script>
+</body>
+</html>
