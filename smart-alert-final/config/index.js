@@ -31,7 +31,7 @@ const config = {
   },
 
   alerts: {
-    cooldownMs: parseInt(process.env.ALERT_COOLDOWN_MS) || 2000,
+    cooldownMs: parseInt(process.env.ALERT_COOLDOWN_MS) || 500,
     maxPerMinute: parseInt(process.env.MAX_ALERTS_PER_MINUTE) || 10,
   },
 

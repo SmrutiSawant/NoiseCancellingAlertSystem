@@ -37,7 +37,7 @@ main{display:grid;grid-template-columns:340px 1fr;height:calc(100vh - 60px);}
 .fld input::placeholder{color:var(--tx3);}
 .btn{width:100%;padding:10px;border-radius:var(--rs);border:none;font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
 .bp{background:var(--ac);color:#fff;}.bp:hover{background:var(--ac2);}.bp:disabled{opacity:.4;cursor:not-allowed;}
-.bd2{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,113,113,.2);margin-top:8px;}
+.bdc{background:var(--rdd);color:var(--rd);border:1px solid rgba(248,113,113,.2);margin-top:8px;}
 .ubadge{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--sf2);border-radius:var(--rs);border:1px solid var(--bd);}
 .avatar{width:32px;height:32px;border-radius:50%;background:var(--glow);border:1px solid var(--ac);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--ac2);flex-shrink:0;}
 .uinfo{flex:1;min-width:0;}.uname{font-size:13px;font-weight:600;}.usub{font-size:11px;color:var(--tx2);font-family:var(--mo);}
@@ -91,7 +91,7 @@ textarea:focus{border-color:var(--ac);}
 .aitem{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:var(--rs);border:1px solid var(--bd);background:var(--sf);margin-bottom:8px;animation:sli .2s ease;}
 .adot{width:8px;height:8px;border-radius:50%;background:var(--am);margin-top:5px;flex-shrink:0;box-shadow:0 0 6px var(--am);}
 .abody{flex:1;min-width:0;}.aword{font-size:14px;font-weight:600;color:var(--am);}
-.atx{font-size:12px;font-family:var(--mo);color:var(--tx2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.atx{font-size:12px;font-family:var(--mo);color:var(--tx2);margin-top:3px;}
 .ameta{font-size:11px;font-family:var(--mo);color:var(--tx3);margin-top:4px;}
 .empty{text-align:center;padding:60px 20px;color:var(--tx3);font-size:13px;}.eico{font-size:32px;margin-bottom:10px;opacity:.4;}
 .lcard{background:var(--sf);border:1px solid var(--bd2);border-radius:var(--r);padding:20px;margin-bottom:16px;}
@@ -102,12 +102,20 @@ textarea:focus{border-color:var(--ac);}
 .si .lb{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);}
 .si .vl{font-size:18px;font-weight:600;color:var(--tx);margin-top:2px;font-family:var(--mo);}
 .si .vl.g{color:var(--gn);}.si .vl.a{color:var(--am);}
+
+/* Live transcript display */
+.live-tx-box{background:var(--sf2);border:1px solid var(--bd2);border-radius:var(--rs);padding:12px 14px;margin-bottom:14px;min-height:44px;}
+.live-tx-label{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px;}
+.live-tx-text{font-size:13px;font-family:var(--mo);color:var(--tx2);line-height:1.6;min-height:20px;}
+.live-tx-text .interim{color:var(--tx3);font-style:italic;}
+.live-tx-text .kwmatch{color:var(--am);font-weight:600;text-decoration:underline dotted;}
+
 .lbtns{display:flex;gap:8px;}
 .blis{flex:1;padding:11px;border-radius:var(--rs);font-family:var(--fn);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid;}
 .blis.start{background:var(--gd);border-color:rgba(74,222,128,.3);color:var(--gn);}.blis.start:hover{background:rgba(74,222,128,.2);}
 .blis.stop{background:var(--rdd);border-color:rgba(248,113,113,.2);color:var(--rd);}.blis:disabled{opacity:.35;cursor:not-allowed;}
 .lnote{font-size:11px;color:var(--tx3);margin-top:10px;font-family:var(--mo);line-height:1.6;}
-.flash{position:fixed;inset:0;pointer-events:none;background:rgba(251,191,36,.08);z-index:999;opacity:0;transition:opacity .1s;}.flash.on{opacity:1;}
+.flash{position:fixed;inset:0;pointer-events:none;background:rgba(251,191,36,.1);z-index:999;opacity:0;transition:opacity .08s;}.flash.on{opacity:1;}
 .toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--rs);font-size:13px;font-family:var(--mo);z-index:1000;animation:ti .2s ease;pointer-events:none;}
 @keyframes ti{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .toast.ok{background:var(--gd);border:1px solid rgba(74,222,128,.3);color:var(--gn);}
@@ -142,7 +150,7 @@ textarea:focus{border-color:var(--ac);}
         <button class="atab" onclick="swAuth('register')">Register</button>
       </div>
       <div class="fld"><label>Username</label><input id="aun" placeholder="your_username" autocomplete="username"></div>
-      <div class="fld"><label>Password</label><input id="apw" type="password" placeholder="••••••••" autocomplete="current-password"></div>
+      <div class="fld"><label>Password</label><input id="apw" type="password" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doAuth()"></div>
       <div id="aerr" class="errmsg" style="display:none"></div>
       <button class="btn bp" id="abtn" onclick="doAuth()" style="margin-top:4px;">Login</button>
     </div>
@@ -151,7 +159,7 @@ textarea:focus{border-color:var(--ac);}
         <div class="avatar" id="avEl">?</div>
         <div class="uinfo"><div class="uname" id="unEl">—</div><div class="usub">logged in</div></div>
       </div>
-      <button class="btn bd2" onclick="doLogout()">Logout</button>
+      <button class="btn bdc" onclick="doLogout()">Logout</button>
     </div>
   </div>
   <div class="sec">
@@ -185,6 +193,8 @@ textarea:focus{border-color:var(--ac);}
     <button class="tab" onclick="swTab('live')">Live Listen</button>
     <button class="tab" onclick="swTab('log')">Alert Log</button>
   </div>
+
+  <!-- TRANSCRIPT TEST TAB -->
   <div class="tpane active" id="tp-tx">
     <div class="txbox">
       <div class="txlbl">Submit transcript for keyword detection</div>
@@ -199,6 +209,8 @@ textarea:focus{border-color:var(--ac);}
     </div>
     <div id="res"></div>
   </div>
+
+  <!-- LIVE LISTEN TAB -->
   <div class="tpane" id="tp-live">
     <div class="lcard">
       <div class="lwv"><canvas id="wc"></canvas></div>
@@ -207,356 +219,396 @@ textarea:focus{border-color:var(--ac);}
         <div class="si"><div class="lb">Voice signal</div><div class="vl g" id="ss">—</div></div>
         <div class="si"><div class="lb">VAD state</div><div class="vl" id="vs">—</div></div>
       </div>
+
+      <!-- LIVE TRANSCRIPT BOX — shows what's being heard in real time -->
+      <div class="live-tx-box">
+        <div class="live-tx-label">Hearing right now</div>
+        <div class="live-tx-text" id="liveTx"><span style="color:var(--tx3);">Start microphone to see live transcript…</span></div>
+      </div>
+
       <div class="lbtns">
         <button class="blis start" id="lsb" onclick="startListen()">Start Microphone</button>
         <button class="blis stop" id="lstp" onclick="stopListen()" disabled>Stop</button>
       </div>
-      <div class="lnote">Microphone streams to the browser. Web Speech API transcribes speech and sends it to the backend for keyword detection in real time.</div>
+      <div class="lnote">
+        ⚡ Detection fires on <b>both interim and final</b> results — no need to pause speaking.<br>
+        Client-side matching means zero latency alerts even before the backend responds.
+      </div>
     </div>
     <div id="liveRes"></div>
   </div>
+
+  <!-- ALERT LOG TAB -->
   <div class="tpane" id="tp-log">
     <div class="ahdr"><span class="atitle">Alert History</span><button class="bref" onclick="loadAlerts()">↻ Refresh</button></div>
-    <div id="alist"><div class="empty"><div class="eico">🔕</div>Start a session, then send a transcript with one of your keywords.</div></div>
+    <div id="alist"><div class="empty"><div class="eico">🔕</div>Start a session and speak one of your keywords to see alerts here.</div></div>
   </div>
 </div>
 </main>
 </div>
 
 <script>
-// API is same-origin — no CORS issues since UI is served by the backend itself
 const API = '';
 let tok = localStorage.getItem('sa_tok'), user = null, sid = null;
 let kws = ['Alice', 'hey', 'John'], amode = 'login';
 let ac = null, an = null, ms = null, aid = null, rec = null, listening = false, sp = 0;
 
+// Client-side cooldown — prevents duplicate alerts from interim results
+let lastAlertTs = 0;
+const CLIENT_COOLDOWN_MS = 3000;
+
 (async () => { await chkSrv(); renderChips(); if (tok) await fetchMe(); })();
 
+// ── Server health ─────────────────────────────────────────────────────────────
 async function chkSrv() {
-  try {
-    const r = await fetch(API + '/health');
-    const j = await r.json();
-    setSrv(j.status === 'ok');
-  } catch { setSrv(false); }
+  try { const j = await fetch(API+'/health').then(r=>r.json()); setSrv(j.status==='ok'); }
+  catch { setSrv(false); }
 }
 function setSrv(ok) {
-  document.getElementById('sdot').className = 'dot' + (ok ? ' on' : ' err');
+  document.getElementById('sdot').className = 'dot'+(ok?' on':' err');
   document.getElementById('stxt').textContent = ok ? 'server online' : 'server offline — run npm run dev';
 }
 
+// ── Auth ──────────────────────────────────────────────────────────────────────
 function swAuth(m) {
   amode = m;
-  document.querySelectorAll('.atab').forEach((t, i) => t.classList.toggle('active', (i === 0 && m === 'login') || (i === 1 && m === 'register')));
-  document.getElementById('abtn').textContent = m === 'login' ? 'Login' : 'Register';
+  document.querySelectorAll('.atab').forEach((t,i) => t.classList.toggle('active',(i===0&&m==='login')||(i===1&&m==='register')));
+  document.getElementById('abtn').textContent = m==='login'?'Login':'Register';
   document.getElementById('aerr').style.display = 'none';
 }
 
 async function doAuth() {
-  const un = document.getElementById('aun').value.trim();
-  const pw = document.getElementById('apw').value;
-  const ee = document.getElementById('aerr');
-  ee.style.display = 'none';
-  if (!un || !pw) { ee.style.display = 'block'; ee.textContent = 'Enter username and password'; return; }
-  const btn = document.getElementById('abtn');
-  btn.disabled = true; btn.textContent = '…';
+  const un=document.getElementById('aun').value.trim(), pw=document.getElementById('apw').value, ee=document.getElementById('aerr');
+  ee.style.display='none';
+  if(!un||!pw){ee.style.display='block';ee.textContent='Enter username and password';return;}
+  const btn=document.getElementById('abtn'); btn.disabled=true; btn.textContent='…';
   try {
-    const r = await fetch(API + '/api/auth/' + amode, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: un, password: pw })
-    });
+    const r = await fetch(API+'/api/auth/'+amode,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:un,password:pw})});
     const j = await r.json();
-    if (!r.ok) { ee.style.display = 'block'; ee.textContent = j.error || 'Failed'; return; }
-    tok = j.token;
-    localStorage.setItem('sa_tok', tok);
-    user = j.user;
-    showUser();
-    toast('Logged in as ' + un, 'ok');
-  } catch (e) {
-    ee.style.display = 'block';
-    ee.textContent = 'Cannot reach server';
-  } finally {
-    btn.disabled = false;
-    btn.textContent = amode === 'login' ? 'Login' : 'Register';
-  }
+    if(!r.ok){ee.style.display='block';ee.textContent=j.error||'Failed';return;}
+    tok=j.token; localStorage.setItem('sa_tok',tok); user=j.user; showUser(); toast('Logged in as '+un,'ok');
+  } catch { ee.style.display='block'; ee.textContent='Cannot reach server'; }
+  finally { btn.disabled=false; btn.textContent=amode==='login'?'Login':'Register'; }
 }
 
 async function fetchMe() {
   try {
-    const r = await fetch(API + '/api/auth/me', { headers: { Authorization: 'Bearer ' + tok } });
-    if (!r.ok) { tok = null; localStorage.removeItem('sa_tok'); return; }
-    const j = await r.json();
-    user = j.user; showUser();
+    const r = await fetch(API+'/api/auth/me',{headers:{Authorization:'Bearer '+tok}});
+    if(!r.ok){tok=null;localStorage.removeItem('sa_tok');return;}
+    user=(await r.json()).user; showUser();
   } catch {}
 }
 
 function showUser() {
-  document.getElementById('authP').style.display = 'none';
-  document.getElementById('userP').style.display = 'block';
-  document.getElementById('unEl').textContent = user.username;
-  document.getElementById('avEl').textContent = user.username.slice(0, 2).toUpperCase();
+  document.getElementById('authP').style.display='none';
+  document.getElementById('userP').style.display='block';
+  document.getElementById('unEl').textContent=user.username;
+  document.getElementById('avEl').textContent=user.username.slice(0,2).toUpperCase();
 }
 
 function doLogout() {
-  tok = null; user = null; sid = null;
-  localStorage.removeItem('sa_tok');
-  document.getElementById('authP').style.display = 'block';
-  document.getElementById('userP').style.display = 'none';
-  document.getElementById('sinfo').style.display = 'none';
-  const sb = document.getElementById('sbtn');
-  sb.textContent = 'Start'; sb.className = 'bsm'; sb.disabled = false;
-  stopListen();
-  toast('Logged out', 'inf');
+  tok=null;user=null;sid=null; localStorage.removeItem('sa_tok');
+  document.getElementById('authP').style.display='block';
+  document.getElementById('userP').style.display='none';
+  document.getElementById('sinfo').style.display='none';
+  const sb=document.getElementById('sbtn'); sb.textContent='Start';sb.className='bsm';sb.disabled=false;
+  stopListen(); toast('Logged out','inf');
 }
 
+// ── Session ───────────────────────────────────────────────────────────────────
 async function doSession() {
-  if (!tok) { toast('Login first', 'err'); return; }
-  if (sid) {
-    try { await fetch(API + '/api/sessions/' + sid, { method: 'DELETE', headers: { Authorization: 'Bearer ' + tok } }); } catch {}
-    sid = null;
-    document.getElementById('sinfo').style.display = 'none';
-    const sb = document.getElementById('sbtn');
-    sb.textContent = 'Start'; sb.className = 'bsm'; sb.disabled = false;
-    stopListen();
-    toast('Session stopped', 'inf');
-    return;
+  if(!tok){toast('Login first','err');return;}
+  if(sid){
+    try{await fetch(API+'/api/sessions/'+sid,{method:'DELETE',headers:{Authorization:'Bearer '+tok}});}catch{}
+    sid=null;
+    document.getElementById('sinfo').style.display='none';
+    const sb=document.getElementById('sbtn'); sb.textContent='Start';sb.className='bsm';sb.disabled=false;
+    stopListen(); toast('Session stopped','inf'); return;
   }
-  const nm = document.getElementById('snm').value || 'WFH Session';
-  const sensitivity = parseInt(document.getElementById('sl1').value);
-  const noiseReductionStrength = parseInt(document.getElementById('sl2').value) / 100;
-  const sb = document.getElementById('sbtn');
-  sb.disabled = true; sb.textContent = '…';
+  const sb=document.getElementById('sbtn'); sb.disabled=true; sb.textContent='…';
   try {
-    const r = await fetch(API + '/api/sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
-      body: JSON.stringify({ name: nm, sensitivity, noiseReductionStrength, keywords: kws })
+    const r = await fetch(API+'/api/sessions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},
+      body:JSON.stringify({
+        name:document.getElementById('snm').value||'WFH Session',
+        sensitivity:parseInt(document.getElementById('sl1').value),
+        noiseReductionStrength:parseInt(document.getElementById('sl2').value)/100,
+        keywords:kws
+      })
     });
-    const j = await r.json();
-    if (!r.ok) { toast((j.error || 'Failed to create session') + ' — check backend console', 'err'); sb.disabled = false; sb.textContent = 'Start'; return; }
-    sid = j.session.id;
-    document.getElementById('sinfo').style.display = 'flex';
-    document.getElementById('sidEl').textContent = 'ID: ' + sid;
-    sb.textContent = 'Stop'; sb.className = 'bsm stop'; sb.disabled = false;
-    toast('Session started ✓', 'ok');
-  } catch (e) {
-    toast('Server error: ' + e.message, 'err');
-    sb.disabled = false; sb.textContent = 'Start';
-  }
+    const j=await r.json();
+    if(!r.ok){toast((j.error||'Failed')+' — check backend console','err');sb.disabled=false;sb.textContent='Start';return;}
+    sid=j.session.id;
+    document.getElementById('sinfo').style.display='flex';
+    document.getElementById('sidEl').textContent='ID: '+sid;
+    sb.textContent='Stop'; sb.className='bsm stop'; sb.disabled=false;
+    toast('Session started ✓','ok');
+  } catch(e) { toast('Server error: '+e.message,'err'); sb.disabled=false; sb.textContent='Start'; }
 }
 
-function addKw() {
-  const inp = document.getElementById('ki'), v = inp.value.trim();
-  if (v && !kws.includes(v)) { kws.push(v); renderChips(); }
-  inp.value = '';
-}
-function removeKw(i) { kws.splice(i, 1); renderChips(); }
-function renderChips() {
-  document.getElementById('chips').innerHTML = kws.map((k, i) =>
+// ── Keywords ──────────────────────────────────────────────────────────────────
+function addKw(){const inp=document.getElementById('ki'),v=inp.value.trim();if(v&&!kws.includes(v)){kws.push(v);renderChips();}inp.value='';}
+function removeKw(i){kws.splice(i,1);renderChips();}
+function renderChips(){
+  document.getElementById('chips').innerHTML=kws.map((k,i)=>
     `<div class="chip">${k}<button class="cdel" onclick="removeKw(${i})">×</button></div>`
   ).join('');
 }
 
-function setTx(t) { document.getElementById('txi').value = t; }
+// ── CLIENT-SIDE keyword detection ────────────────────────────────────────────
+// This runs INSTANTLY on every interim result — no backend round-trip needed
+function clientDetect(transcript) {
+  const lower = transcript.toLowerCase();
+  for (const kw of kws) {
+    if (lower.includes(kw.toLowerCase())) return kw;
+  }
+  return null;
+}
+
+// ── Transcript test tab ───────────────────────────────────────────────────────
+function setTx(t){document.getElementById('txi').value=t;}
 
 async function doAnalyze() {
-  if (!sid) { toast('Start a session first', 'err'); return; }
-  const tx = document.getElementById('txi').value.trim();
-  if (!tx) { toast('Enter a transcript first', 'err'); return; }
-  const btn = document.getElementById('abtn2');
-  btn.disabled = true; btn.textContent = 'Analyzing…';
+  if(!sid){toast('Start a session first','err');return;}
+  const tx=document.getElementById('txi').value.trim();
+  if(!tx){toast('Enter a transcript first','err');return;}
+  const btn=document.getElementById('abtn2'); btn.disabled=true; btn.textContent='Analyzing…';
   try {
-    const r = await fetch(API + '/api/sessions/' + sid + '/transcript', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
-      body: JSON.stringify({ transcript: tx, isFinal: true, confidence: 0.95 })
+    const r=await fetch(API+'/api/sessions/'+sid+'/transcript',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},
+      body:JSON.stringify({transcript:tx,isFinal:true,confidence:0.95})
     });
-    const j = await r.json();
-    if (!r.ok) { toast(j.error || 'Analysis error', 'err'); return; }
-    addResult(tx, j);
-    if (j.detectionsCount > 0) { doFlash(); playBeep(); }
-  } catch (e) { toast('Server error: ' + e.message, 'err'); }
-  finally { btn.disabled = false; btn.textContent = 'Analyze →'; }
+    const j=await r.json();
+    if(!r.ok){toast(j.error||'Error','err');return;}
+    addResult(tx,j); if(j.detectionsCount>0){doFlash();playBeep();}
+  } catch(e){toast('Server error: '+e.message,'err');}
+  finally{btn.disabled=false;btn.textContent='Analyze →';}
 }
 
-function addResult(tx, j) {
-  const area = document.getElementById('res'), hit = j.detectionsCount > 0;
-  const now = new Date().toLocaleTimeString();
-  let disp = tx.replace(/</g, '&lt;');
-  if (hit) j.detections.forEach(d => {
-    disp = disp.replace(new RegExp(d.matchedWord.replace(/</g,'&lt;'), 'gi'), m => `<span class="rmatch">${m}</span>`);
+function addResult(tx,j) {
+  const area=document.getElementById('res'), hit=j.detectionsCount>0, now=new Date().toLocaleTimeString();
+  let disp=tx.replace(/</g,'&lt;');
+  if(hit) j.detections.forEach(d=>{
+    disp=disp.replace(new RegExp(d.matchedWord.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),m=>`<span class="rmatch">${m}</span>`);
   });
-  const el = document.createElement('div');
-  el.className = 'rcard ' + (hit ? 'hit' : 'miss');
-  el.innerHTML = `
-    <div class="rhead">
-      <div class="rbadge ${hit ? 'hit' : 'miss'}">${hit ? '⚡ KEYWORD DETECTED' : '○ no match'}</div>
-      <span class="rtime">${now}</span>
-    </div>
-    <div class="rtx">${disp}</div>
-    ${hit ? `<div class="rconf">matched: <b>${j.detections.map(d => d.matchedWord).join(', ')}</b> · confidence: ${Math.round((j.detections[0]?.confidence || 0) * 100)}%</div>` : ''}
-  `;
-  area.insertBefore(el, area.firstChild);
-  if (area.children.length > 20) area.removeChild(area.lastChild);
+  const el=document.createElement('div'); el.className='rcard '+(hit?'hit':'miss');
+  el.innerHTML=`<div class="rhead"><div class="rbadge ${hit?'hit':'miss'}">${hit?'⚡ KEYWORD DETECTED':'○ no match'}</div><span class="rtime">${now}</span></div><div class="rtx">${disp}</div>${hit?`<div class="rconf">matched: <b>${j.detections.map(d=>d.matchedWord).join(', ')}</b> · confidence: ${Math.round((j.detections[0]?.confidence||0)*100)}%</div>`:''}`;
+  area.insertBefore(el,area.firstChild);
+  if(area.children.length>20)area.removeChild(area.lastChild);
 }
 
+// ── Alert log tab ─────────────────────────────────────────────────────────────
 async function loadAlerts() {
-  if (!sid) { toast('Start a session first', 'err'); return; }
+  if(!sid){toast('Start a session first','err');return;}
   try {
-    const r = await fetch(API + '/api/sessions/' + sid + '/alerts', { headers: { Authorization: 'Bearer ' + tok } });
-    const j = await r.json();
-    renderAlerts(j.alerts || []);
-  } catch { toast('Failed to load alerts', 'err'); }
+    const j=await fetch(API+'/api/sessions/'+sid+'/alerts',{headers:{Authorization:'Bearer '+tok}}).then(r=>r.json());
+    renderAlerts(j.alerts||[]);
+  } catch{toast('Failed to load alerts','err');}
 }
 
 function renderAlerts(arr) {
-  const el = document.getElementById('alist');
-  if (!arr.length) {
-    el.innerHTML = '<div class="empty"><div class="eico">🔕</div>No alerts yet. Send a transcript containing one of your keywords.</div>';
-    return;
-  }
-  el.innerHTML = arr.map(a => {
-    const ts = new Date(Number(a.triggered_at) * 1000).toLocaleString();
-    return `<div class="aitem">
-      <div class="adot"></div>
-      <div class="abody">
-        <div class="aword">"${a.matched_word}"</div>
-        ${a.transcript ? `<div class="atx">${a.transcript}</div>` : ''}
-        <div class="ameta">${ts}</div>
-      </div>
-      ${a.confidence ? `<div style="font-size:11px;color:var(--tx3);font-family:var(--mo);flex-shrink:0;">${Math.round(a.confidence * 100)}%</div>` : ''}
-    </div>`;
+  const el=document.getElementById('alist');
+  if(!arr.length){el.innerHTML='<div class="empty"><div class="eico">🔕</div>No alerts yet. Speak one of your keywords while the microphone is active.</div>';return;}
+  el.innerHTML=arr.map(a=>{
+    const ts=new Date(Number(a.triggered_at)*1000).toLocaleString();
+    return `<div class="aitem"><div class="adot"></div><div class="abody"><div class="aword">"${a.matched_word}"</div>${a.transcript?`<div class="atx">${a.transcript}</div>`:''}<div class="ameta">${ts}</div></div>${a.confidence?`<div style="font-size:11px;color:var(--tx3);font-family:var(--mo);flex-shrink:0;">${Math.round(a.confidence*100)}%</div>`:''}</div>`;
   }).join('');
 }
 
+// ── Live Listen ───────────────────────────────────────────────────────────────
 async function startListen() {
-  if (!sid) { toast('Start a session first', 'err'); return; }
-  listening = true;
-  document.getElementById('lsb').disabled = true;
-  document.getElementById('lstp').disabled = false;
-  document.getElementById('vs').textContent = 'Active';
-  document.getElementById('vs').className = 'vl g';
+  if(!sid){toast('Start a session first','err');return;}
+  listening=true;
+  document.getElementById('lsb').disabled=true;
+  document.getElementById('lstp').disabled=false;
+  document.getElementById('vs').textContent='Active'; document.getElementById('vs').className='vl g';
+  document.getElementById('liveTx').innerHTML='<span style="color:var(--tx3)">Listening… speak now</span>';
   try {
-    ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-    ac = new (window.AudioContext || window.webkitAudioContext)();
-    an = ac.createAnalyser(); an.fftSize = 256;
+    ms=await navigator.mediaDevices.getUserMedia({audio:true});
+    ac=new(window.AudioContext||window.webkitAudioContext)();
+    an=ac.createAnalyser(); an.fftSize=256;
     ac.createMediaStreamSource(ms).connect(an);
-    drawWave(); startSR();
-    toast('Microphone active', 'ok');
+    drawWave(); toast('Microphone active','ok');
   } catch {
-    toast('Mic denied — showing simulated waveform', 'inf');
+    toast('Mic denied — waveform simulated, speech detection still works','inf');
     simWave();
   }
+  startSR();
 }
 
 function stopListen() {
-  listening = false;
-  if (aid) { cancelAnimationFrame(aid); aid = null; }
-  if (rec) { try { rec.stop(); } catch {} rec = null; }
-  if (ms) { ms.getTracks().forEach(t => t.stop()); ms = null; }
-  if (ac) { ac.close().catch(() => {}); ac = null; }
-  document.getElementById('lsb').disabled = false;
-  document.getElementById('lstp').disabled = true;
-  ['vs', 'ns', 'ss'].forEach(id => { document.getElementById(id).textContent = '—'; document.getElementById(id).className = 'vl'; });
-  const cv = document.getElementById('wc'); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height);
+  listening=false;
+  if(aid){cancelAnimationFrame(aid);aid=null;}
+  if(rec){try{rec.stop();}catch{}rec=null;}
+  if(ms){ms.getTracks().forEach(t=>t.stop());ms=null;}
+  if(ac){ac.close().catch(()=>{});ac=null;}
+  document.getElementById('lsb').disabled=false;
+  document.getElementById('lstp').disabled=true;
+  ['vs','ns','ss'].forEach(id=>{const e=document.getElementById(id);e.textContent='—';e.className='vl';});
+  document.getElementById('liveTx').innerHTML='<span style="color:var(--tx3)">Start microphone to see live transcript…</span>';
+  const cv=document.getElementById('wc'); cv.getContext('2d').clearRect(0,0,cv.width,cv.height);
 }
 
 function startSR() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { toast('Speech recognition not supported in this browser (use Chrome)', 'inf'); return; }
-  rec = new SR(); rec.continuous = true; rec.interimResults = true;
-  rec.onresult = async e => {
-    let tx = '';
-    for (let i = e.resultIndex; i < e.results.length; i++) tx += e.results[i][0].transcript;
-    if (!e.results[e.results.length - 1].isFinal || !sid || !tok) return;
-    const conf = e.results[e.results.length - 1][0].confidence;
-    try {
-      const r = await fetch(API + '/api/sessions/' + sid + '/transcript', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok },
-        body: JSON.stringify({ transcript: tx, isFinal: true, confidence: conf })
-      });
-      const j = await r.json();
-      if (j.detectionsCount > 0) {
-        doFlash(); playBeep();
-        const area = document.getElementById('liveRes'), el = document.createElement('div');
-        el.className = 'aitem';
-        el.innerHTML = `<div class="adot"></div><div class="abody"><div class="aword">"${j.detections[0].matchedWord}" detected</div><div class="atx">${tx}</div><div class="ameta">${new Date().toLocaleTimeString()}</div></div>`;
-        area.insertBefore(el, area.firstChild);
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){
+    toast('Web Speech API not supported — use Chrome or Edge','err');
+    return;
+  }
+  rec=new SR();
+  rec.continuous=true;
+  rec.interimResults=true;  // ← KEY: get results as you speak, not just at end
+  rec.lang='en-US';
+  rec.maxAlternatives=1;
+
+  rec.onresult=function(e) {
+    let interimText='', finalText='';
+
+    for(let i=e.resultIndex; i<e.results.length; i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalText+=t;
+      else interimText+=t;
+    }
+
+    const allText=(finalText||interimText).trim();
+    if(!allText) return;
+
+    // Update the live transcript display
+    const txEl=document.getElementById('liveTx');
+    const lower=allText.toLowerCase();
+    let display=allText.replace(/</g,'&lt;');
+    kws.forEach(kw=>{
+      display=display.replace(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
+        m=>`<span class="kwmatch">${m}</span>`);
+    });
+    txEl.innerHTML=finalText
+      ? display
+      : `<span class="interim">${display}</span>`;
+
+    // ── CLIENT-SIDE INSTANT DETECTION ──────────────────────────────────────
+    // Fires on EVERY result (interim + final) — this is what makes it instant
+    const now=Date.now();
+    if(now-lastAlertTs < CLIENT_COOLDOWN_MS) return; // client cooldown
+
+    const matched=clientDetect(allText);
+    if(matched) {
+      lastAlertTs=now;
+      triggerLiveAlert(matched, allText);
+
+      // Also send to backend to persist in DB (fire-and-forget)
+      if(sid && tok) {
+        fetch(API+'/api/sessions/'+sid+'/transcript',{
+          method:'POST',
+          headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},
+          body:JSON.stringify({transcript:allText,isFinal:!!finalText,confidence:e.results[e.results.length-1][0].confidence||0.9})
+        }).catch(()=>{});
       }
-    } catch {}
+    }
   };
-  rec.onend = () => { if (listening) { try { rec.start(); } catch {} } };
-  rec.start();
+
+  rec.onerror=function(e){
+    if(e.error==='no-speech') return; // normal — just silence
+    if(e.error==='not-allowed'){toast('Microphone permission denied','err');stopListen();return;}
+    if(e.error==='network'){toast('Network error in speech recognition','inf');return;}
+    console.warn('Speech recognition error:',e.error);
+  };
+
+  rec.onend=function(){
+    // Chrome stops automatically — restart if still listening
+    if(listening){
+      try{ rec.start(); }catch(e){ console.warn('SR restart failed:',e); }
+    }
+  };
+
+  try { rec.start(); }
+  catch(e){ toast('Could not start speech recognition: '+e.message,'err'); }
 }
 
+function triggerLiveAlert(keyword, transcript) {
+  doFlash(); playBeep();
+
+  // Add to live alerts list
+  const area=document.getElementById('liveRes');
+  const el=document.createElement('div');
+  el.className='aitem';
+  el.innerHTML=`
+    <div class="adot"></div>
+    <div class="abody">
+      <div class="aword">⚡ "${keyword}" detected</div>
+      <div class="atx">${transcript.replace(/</g,'&lt;')}</div>
+      <div class="ameta">${new Date().toLocaleTimeString()}</div>
+    </div>`;
+  area.insertBefore(el, area.firstChild);
+
+  toast('🔔 Keyword detected: "'+keyword+'"','ok');
+}
+
+// ── Waveform ──────────────────────────────────────────────────────────────────
 function drawWave() {
-  const cv = document.getElementById('wc'), ctx = cv.getContext('2d'), d = new Uint8Array(an.frequencyBinCount);
+  const cv=document.getElementById('wc'), ctx=cv.getContext('2d'), d=new Uint8Array(an.frequencyBinCount);
   function draw() {
-    if (!listening) return;
-    aid = requestAnimationFrame(draw);
+    if(!listening)return;
+    aid=requestAnimationFrame(draw);
     an.getByteTimeDomainData(d);
-    const W = cv.offsetWidth, H = cv.offsetHeight;
-    cv.width = W; cv.height = H; ctx.clearRect(0, 0, W, H);
-    let s = 0; for (let i = 0; i < d.length; i++) s += Math.abs(d[i] - 128);
-    const avg = s / d.length;
-    document.getElementById('ns').textContent = Math.round(avg * 3) + '%';
-    document.getElementById('ss').textContent = avg > 6 ? Math.round(avg * 5) + '%' : '0%';
-    document.getElementById('vs').textContent = avg > 6 ? 'Speech' : 'Silence';
-    document.getElementById('vs').className = 'vl ' + (avg > 6 ? 'a' : 'g');
-    ctx.strokeStyle = '#7c6fcd'; ctx.lineWidth = 1.5; ctx.beginPath();
-    const sw = W / d.length; let x = 0;
-    for (let i = 0; i < d.length; i++) { const y = (d[i] / 128) * H / 2; i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); x += sw; }
+    const W=cv.offsetWidth,H=cv.offsetHeight; cv.width=W; cv.height=H; ctx.clearRect(0,0,W,H);
+    let s=0; for(let i=0;i<d.length;i++)s+=Math.abs(d[i]-128); const avg=s/d.length;
+    document.getElementById('ns').textContent=Math.round(avg*3)+'%';
+    document.getElementById('ss').textContent=avg>6?Math.round(avg*5)+'%':'0%';
+    document.getElementById('vs').textContent=avg>6?'Speech':'Silence';
+    document.getElementById('vs').className='vl '+(avg>6?'a':'g');
+    ctx.strokeStyle='#7c6fcd'; ctx.lineWidth=1.5; ctx.beginPath();
+    const sw=W/d.length; let x=0;
+    for(let i=0;i<d.length;i++){const y=(d[i]/128)*H/2; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); x+=sw;}
     ctx.stroke();
   }
   draw();
 }
 
 function simWave() {
-  const cv = document.getElementById('wc'), ctx = cv.getContext('2d');
+  const cv=document.getElementById('wc'), ctx=cv.getContext('2d');
   function draw() {
-    if (!listening) return;
-    aid = requestAnimationFrame(draw); sp += 0.1;
-    const W = cv.offsetWidth || 500, H = cv.offsetHeight || 60;
-    cv.width = W; cv.height = H; ctx.clearRect(0, 0, W, H);
-    ctx.strokeStyle = '#7c6fcd'; ctx.lineWidth = 1.5; ctx.beginPath();
-    for (let i = 0; i < W; i++) { const y = H / 2 + Math.sin(i / 15 + sp) * 10 + Math.sin(i / 7 + sp * 1.3) * 4; i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y); }
+    if(!listening)return;
+    aid=requestAnimationFrame(draw); sp+=0.1;
+    const W=cv.offsetWidth||500,H=cv.offsetHeight||60; cv.width=W; cv.height=H; ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#7c6fcd'; ctx.lineWidth=1.5; ctx.beginPath();
+    for(let i=0;i<W;i++){const y=H/2+Math.sin(i/15+sp)*10+Math.sin(i/7+sp*1.3)*4; i===0?ctx.moveTo(i,y):ctx.lineTo(i,y);}
     ctx.stroke();
-    document.getElementById('ns').textContent = Math.round(20 + Math.sin(sp) * 15) + '%';
-    document.getElementById('ss').textContent = Math.round(30 + Math.cos(sp * 0.7) * 20) + '%';
-    document.getElementById('vs').textContent = 'Sim';
+    document.getElementById('ns').textContent=Math.round(20+Math.sin(sp)*15)+'%';
+    document.getElementById('ss').textContent=Math.round(30+Math.cos(sp*.7)*20)+'%';
   }
   draw();
 }
 
+// ── Tabs ──────────────────────────────────────────────────────────────────────
 function swTab(n) {
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['tx', 'live', 'log'][i] === n));
-  document.querySelectorAll('.tpane').forEach(p => p.classList.remove('active'));
-  document.getElementById('tp-' + n).classList.add('active');
-  if (n === 'log') loadAlerts();
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['tx','live','log'][i]===n));
+  document.querySelectorAll('.tpane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tp-'+n).classList.add('active');
+  if(n==='log')loadAlerts();
 }
 
-function doFlash() { const f = document.getElementById('fl'); f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 600); }
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function doFlash(){const f=document.getElementById('fl');f.classList.add('on');setTimeout(()=>f.classList.remove('on'),500);}
 
-function playBeep() {
-  try {
-    const a = new AudioContext(), o = a.createOscillator(), g = a.createGain();
-    o.connect(g); g.connect(a.destination);
-    o.frequency.value = 880;
-    g.gain.setValueAtTime(0.25, a.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, a.currentTime + 0.35);
-    o.start(); o.stop(a.currentTime + 0.35);
-  } catch {}
+function playBeep(){
+  try{
+    const a=new AudioContext(),o=a.createOscillator(),g=a.createGain();
+    o.connect(g);g.connect(a.destination);
+    o.frequency.value=880;
+    g.gain.setValueAtTime(0.3,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,a.currentTime+0.4);
+    o.start();o.stop(a.currentTime+0.4);
+  }catch{}
 }
 
 let _t;
-function toast(msg, type) {
-  if (_t) _t.remove();
-  _t = document.createElement('div');
-  _t.className = 'toast ' + type;
-  _t.textContent = msg;
+function toast(msg,type){
+  if(_t)_t.remove();
+  _t=document.createElement('div'); _t.className='toast '+type; _t.textContent=msg;
   document.body.appendChild(_t);
-  setTimeout(() => { if (_t) { _t.remove(); _t = null; } }, 3500);
+  setTimeout(()=>{if(_t){_t.remove();_t=null;}},3500);
 }
 
 renderChips();
